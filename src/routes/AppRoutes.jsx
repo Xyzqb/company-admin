@@ -29,7 +29,7 @@ import PrivateRoute from "../components/PrivateRoute";
 // Layout wrapper for authenticated routes
 function AppLayout() {
   return (
-    <div style={{ display: "flex", minHeight: "200vh", flexDirection: "column", background: "#1e293b" }}>
+    <div style={{ display: "flex", minHeight: "140vh", width:"1250px", flexDirection: "column", background: "#1e293b" }}>
       <Navbar />
       <div style={{ display: "flex", flex: 1 }}>
         <Sidebar />

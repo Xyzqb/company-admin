@@ -18,8 +18,10 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const BASE_URL = "https://digidial-admin.onrender.com";
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzIiwiZW1haWwiOiJhZG1pbkB4eXouY29tIiwiZ2xvYmFsX3JvbGUiOiJhZG1pbiIsImNvbXBhbnlfaWQiOiIyIiwiaWF0IjoxNzYwMDgwNDI5LCJleHAiOjE3NjAxNjY4Mjl9.Ok7Q5NU9N-iHoE-OlFO1qxRs1FV-WWDWtf60SNDkjoE";
+const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
+ const TOKEN =
+    localStorage.getItem("authToken") ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTAyMTE0NCwiZXhwIjoxNzYxMTA3NTQ0fQ.P6Yd6qwhCoORGg7SFsHnF9AINty4amVokAXFdd3t3gY";
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState([]);
@@ -70,19 +72,38 @@ const TeamsPage = () => {
   };
 
   // Create team
+  // const createTeam = async () => {
+  //   const { id, name } = teamForm;
+  //   if (!id || !name) return showSnackbar("Please fill all fields", "warning");
+  //   setLoading(true);
+  //   try {
+  //     await api.post("/api/admin/teams/create", { id, name });
+  //     showSnackbar("Team created successfully!", "success");
+  //     setTeamForm({ id: "", name: "" });
+  //     fetchTeams();
+  //   } catch (err) {
+  //     console.error(err);
+  //     showSnackbar(err.response?.data?.message || "Error creating team", "error");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const createTeam = async () => {
-    const { id, name } = teamForm;
-    if (!id || !name) return showSnackbar("Please fill all fields", "warning");
+    const {name} = teamForm;
+    if(!name.trim()) return showSnackbar("Please enter a team name", "warning");
     setLoading(true);
-    try {
-      await api.post("/api/admin/teams/create", { id, name });
-      showSnackbar("Team created successfully!", "success");
-      setTeamForm({ id: "", name: "" });
+    try{
+      const res = await api.post("/api/admin/teams/create", {
+        name,
+        members:[]
+      });
+      showSnackbar(res.data?.message || "team created successfully", "success");
+      setTeamForm({id: "", name: ""});
       fetchTeams();
-    } catch (err) {
+    } catch(err){
       console.error(err);
       showSnackbar(err.response?.data?.message || "Error creating team", "error");
-    } finally {
+    } finally{
       setLoading(false);
     }
   };
@@ -144,14 +165,17 @@ const TeamsPage = () => {
       </Paper>
 
       {/* Team Form */}
-      <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9" }}>
+      <Box sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9", color:"black" , fontWeight:"bold" }}>
+        <Typography variant="h6">Create Team</Typography>
+      {/* <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9" }}> */}
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-          <TextField
+          {/* <TextField
             label="Team ID"
             value={teamForm.id}
             onChange={(e) => setTeamForm({ ...teamForm, id: e.target.value })}
             size="small"
-          />
+          /> */}
+          
           <TextField
             label="Team Name"
             value={teamForm.name}
@@ -163,7 +187,7 @@ const TeamsPage = () => {
           <Button variant="contained" color="primary" onClick={createTeam}>Create Team</Button>
           <Button variant="contained" color="info" onClick={updateTeam}>Update Team</Button>
         </Stack>
-      </Paper>
+       </Box>
 
       {/* Team Table */}
       <Paper sx={{ p: 2 }}>

@@ -159,6 +159,8 @@
 
 // export default Login;
 
+
+
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -217,6 +219,8 @@ const Login = () => {
         // Save token in localStorage
         localStorage.setItem("authToken", response.data.token);
 
+        console.log("Login successful, token saved.", response.data.token);
+
         // Optional: Save superAdmin info
         localStorage.setItem(
           "superAdmin",
@@ -241,6 +245,7 @@ const Login = () => {
       setLoading(false); // Hide loader
     }
   };
+
 
   return (
     <Box

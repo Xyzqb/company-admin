@@ -33,8 +33,7 @@ const CallHistory = () => {
   });
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MDU4OTM4MCwiZXhwIjoxNzYwNjc1NzgwfQ.UW_34FSSYshroN6wJrfoKtAu5IqFqKu8D895WsSmG4w";
-
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTAyMTE0NCwiZXhwIjoxNzYxMTA3NTQ0fQ.P6Yd6qwhCoORGg7SFsHnF9AINty4amVokAXFdd3t3gY";
   const showSnackbar = (message, severity) =>
     setSnackbar({ open: true, message, severity });
 
@@ -315,4 +314,3 @@ const fetchCallsByTeamId = async (teamId) => {
 };
 
 export default CallHistory;
-

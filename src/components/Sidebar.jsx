@@ -28,7 +28,7 @@ const drawerWidth = 240;
 
 const Sidebar = () => {
   const location = useLocation();
-  const [companyOpen, setCompanyOpen] = useState(false);
+  // const [companyOpen, setCompanyOpen] = useState(false);
   //calls
   const [callsOpen, setCallsOpen] = useState(false);
   //leads
@@ -38,7 +38,7 @@ const Sidebar = () => {
   const [phones, setPhones] = useState(false);
   const handlePhonesClick = () => setPhones(!phones);
 
-  const handleCompanyClick = () => setCompanyOpen(!companyOpen);
+  // const handleCompanyClick = () => setCompanyOpen(!companyOpen);
   //calls
   const handleCallsClick = () => setCallsOpen(!callsOpen);
   //Teams
@@ -231,9 +231,9 @@ const Sidebar = () => {
       </List>
 
       {/* Company Menu */}
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton onClick={handleCompanyClick} sx={{ color: "#fff" }}>
+       <List>
+        {/* <ListItem disablePadding> */}
+          {/* <ListItemButton onClick={handleCompanyClick} sx={{ color: "#fff" }}>
             <ListItemIcon sx={{ color: "#fff" }}>
               <Business />
             </ListItemIcon>
@@ -271,7 +271,7 @@ const Sidebar = () => {
               <ListItemText primary="Company Call Log" />
             </ListItemButton>
 
-            {/* Call Details */}
+          
             <ListItemButton
               component={Link}
               to="companies/call-details"
@@ -281,7 +281,7 @@ const Sidebar = () => {
               <ListItemText primary="Company Call Details" />
             </ListItemButton>
           </List>
-        </Collapse>
+        </Collapse> */}
 
         {/* Analytics */}
         <ListItem disablePadding>
@@ -313,6 +313,9 @@ const Sidebar = () => {
           </ListItemButton>
         </ListItem>
       </List>
+
+
+
 
       <Typography
         variant="caption"
