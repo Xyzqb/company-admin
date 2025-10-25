@@ -21,6 +21,7 @@ import Phones_details from "../Pages/phones/Phone_details";
 import Teams_details from "../Pages/teams/Teams_details";
 import Team_Members from "../Pages/teams_members/Team_members";
 import Webhook_Logs from "../Pages/webhooks/Webhook_logs"
+import CallHistory from "../Pages/calls/Calls_details";
 // Components
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -60,6 +61,8 @@ function AppRoutes() {
 
             {/* call_details */}
             <Route path="pages/list_calls" element={<Call_Details/>}/>
+            <Route path="pages/call-history" element={<CallHistory/>}/>
+
             <Route path="pages/list_callsByFilter" element={<call_filter/>}/>
 
             {/* lead_details */}

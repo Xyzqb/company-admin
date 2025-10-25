@@ -16,169 +16,202 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import axios from "axios";
+
+const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
+const TOKEN = localStorage.getItem("authToken");
 
 const TeamMembersPage = () => {
-  // 🔹 Dummy Users (for lookup)
-  const dummyUsers = [
-    { id: "USER001", name: "John Doe", email: "john@example.com" },
-    { id: "USER002", name: "Jane Smith", email: "jane@example.com" },
-    { id: "USER003", name: "Alex Johnson", email: "alex@example.com" },
-    { id: "USER004", name: "Sophia Lee", email: "sophia@example.com" },
-    { id: "USER005", name: "Michael Brown", email: "michael@example.com" },
-  ];
-
-  // 🔹 Dummy Members Data
-  const dummyMembers = [
-    { id: "M001", teamId: "TEAM1", userId: "USER001", role: "Leader" },
-    { id: "M002", teamId: "TEAM1", userId: "USER002", role: "Developer" },
-    { id: "M003", teamId: "TEAM2", userId: "USER003", role: "Tester" },
-    { id: "M004", teamId: "TEAM2", userId: "USER004", role: "Designer" },
-    { id: "M005", teamId: "TEAM3", userId: "USER005", role: "Support" },
-  ];
-
-  const [members, setMembers] = useState(dummyMembers);
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // Filters
   const [searchTeamId, setSearchTeamId] = useState("");
-
-  // Form
   const [memberForm, setMemberForm] = useState({
-    id: "",
     teamId: "",
     userId: "",
     role: "",
   });
-
-  // Snackbar
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
+  const api = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  });
+
   const showSnackbar = (message, severity) =>
     setSnackbar({ open: true, message, severity });
 
-  // Helper: Get user details
-  const getUserInfo = (userId) => {
-    const user = dummyUsers.find((u) => u.id === userId);
-    return user ? `${user.name} (${user.email})` : userId;
+  // ✅ Fetch all team members  --> working
+  const fetchMembers = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/api/admin/team-members");
+      setMembers(res.data?.team_members || []);
+      showSnackbar("All team members loaded!", "success");
+    } catch (err) {
+      // console.error(err);
+      showSnackbar(
+        err.response?.data?.message || "Failed to fetch members",
+        "error"
+      );
+      setMembers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Filter members by teamId
-  const filterByTeam = () => {
+  // ✅ Fetch team members by Team ID 
+  const fetchMembersByTeam = async () => {
     if (!searchTeamId.trim()) return showSnackbar("Enter Team ID", "warning");
     setLoading(true);
-    setTimeout(() => {
-      const found = dummyMembers.filter(
-        (m) => m.teamId.toLowerCase() === searchTeamId.toLowerCase()
+    try {
+      const res = await api.get("/api/admin/team-members", {
+        params: { team_id: searchTeamId }, // use 'team_id' exactly as backend expects
+      });
+      setMembers(res.data?.team_members || []);
+      if (res.data?.team_members?.length > 0)
+        showSnackbar("Team members loaded!", "success");
+      else showSnackbar("No members found for this team!", "info");
+    } catch (err) {
+      console.error(err);
+      showSnackbar(
+        err.response?.data?.message || "Error fetching team members",
+        "error"
       );
-      if (found.length) setMembers(found), showSnackbar("Team members loaded!", "success");
-      else setMembers([]), showSnackbar("No members found for this team!", "error");
+      setMembers([]);
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
-  // Clear filter
-  const clearFilter = () => {
-    setSearchTeamId("");
-    setMembers(dummyMembers);
-    showSnackbar("Showing all members", "info");
-  };
-
-  // Add new member
-  const addMember = () => {
-    const { id, teamId, userId, role } = memberForm;
-    if (!id || !teamId || !userId || !role)
+  // ✅ Add team member
+  const addMember = async () => {
+    const { teamId, userId, role } = memberForm;
+    if (!teamId || !userId || !role)
       return showSnackbar("Please fill all fields", "warning");
 
-    if (members.some((m) => m.id === id))
-      return showSnackbar("Member ID already exists", "error");
+    setLoading(true);
+    try {
+      const payload = {
+        team_id: Number(teamId),
+        user_id: Number(userId),
+        role: role,
+      };
+      console.log("Adding member with payload:", payload);
 
-    const newMember = { id, teamId, userId, role };
-    setMembers((prev) => [...prev, newMember]);
-    showSnackbar("Member added successfully!", "success");
-    setMemberForm({ id: "", teamId: "", userId: "", role: "" });
+      const res = await api.post("/api/admin/team-members/add", payload);
+
+      setMembers((prev) => [...prev, res.data.member]);
+      showSnackbar("Member added successfully!", "success");
+      setMemberForm({ teamId: "", userId: "", role: "" });
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      showSnackbar(
+        err.response?.data?.message || "Failed to add member",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Remove member
-  const removeMember = (id) => {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
-    showSnackbar("Member removed!", "info");
+  // ✅ Remove member
+  const removeMember = async (teamId, userId) => {
+    setLoading(true);
+    try {
+      await api.delete(`/api/admin/team-members/delete/${teamId}/${userId}`);
+      setMembers((prev) => prev.filter((m) => m.user_id !== userId));
+      showSnackbar("Member removed successfully!", "info");
+    } catch (err) {
+      console.error(err);
+      showSnackbar(
+        err.response?.data?.message || "Failed to remove member",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearFilter = () => {
+    setSearchTeamId("");
+    fetchMembers();
   };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 400);
+    fetchMembers();
   }, []);
-
+  console.log(members);
   return (
     <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
       <Typography variant="h4" mb={2} fontWeight="bold">
         Team Members Management
       </Typography>
 
-      {/* SEARCH SECTION */}
+      {/* ✅ Search Section */}
       <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f8f9fa" }}>
-        <Typography variant="h6" mb={2} fontWeight="bold">
-          Get Members by Team ID
-        </Typography>
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="flex-end">
-          <Box sx={{ flex: 1 }}>
-            <TextField
-              label="Enter Team ID"
-              value={searchTeamId}
-              onChange={(e) => setSearchTeamId(e.target.value)}
-              fullWidth
-              size="small"
-            />
-            <Button
-              variant="outlined"
-              onClick={filterByTeam}
-              sx={{ mt: 1, width: "100%", bgcolor: "primary.main", color: "white" }}
-            >
-              Get Members
-            </Button>
-          </Box>
-          <Button variant="contained" color="secondary" onClick={clearFilter} sx={{ height: "35px" }}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          alignItems="flex-end"
+        >
+          <TextField
+            label="Enter Team ID"
+            value={searchTeamId}
+            onChange={(e) => setSearchTeamId(e.target.value)}
+            size="small"
+            sx={{ width: "300px" }}
+          />
+          <Button
+            variant="contained"
+            onClick={fetchMembersByTeam}
+            sx={{ width: "300px" }}
+          >
+            Get Members by ID
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={clearFilter}
+            sx={{ width: "250px" }}
+          >
             Show All
           </Button>
         </Stack>
       </Paper>
 
-      {/* ADD MEMBER FORM */}
+      {/* ✅ Add Member Section */}
       <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9" }}>
-        <Typography variant="h6" mb={2} fontWeight="bold">
-          Add Team Member
-        </Typography>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-          <TextField
-            label="Member ID"
-            value={memberForm.id}
-            onChange={(e) => setMemberForm({ ...memberForm, id: e.target.value })}
-            size="small"
-            fullWidth
-          />
           <TextField
             label="Team ID"
             value={memberForm.teamId}
-            onChange={(e) => setMemberForm({ ...memberForm, teamId: e.target.value })}
+            onChange={(e) =>
+              setMemberForm({ ...memberForm, teamId: e.target.value })
+            }
             size="small"
-            fullWidth
           />
           <TextField
             label="User ID"
             value={memberForm.userId}
-            onChange={(e) => setMemberForm({ ...memberForm, userId: e.target.value })}
+            onChange={(e) =>
+              setMemberForm({ ...memberForm, userId: e.target.value })
+            }
             size="small"
-            fullWidth
           />
           <TextField
             label="Role"
             value={memberForm.role}
-            onChange={(e) => setMemberForm({ ...memberForm, role: e.target.value })}
+            onChange={(e) =>
+              setMemberForm({ ...memberForm, role: e.target.value })
+            }
             size="small"
-            fullWidth
           />
         </Stack>
         <Button
@@ -191,48 +224,46 @@ const TeamMembersPage = () => {
         </Button>
       </Paper>
 
-      {/* MEMBERS TABLE */}
+      {/* ✅ Members Table */}
       <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" mb={2} fontWeight="bold">
-          Members List {members.length > 0 && `(${members.length})`}
-        </Typography>
-
         {loading ? (
           <Box sx={{ textAlign: "center", py: 3 }}>
             <CircularProgress />
             <Typography sx={{ mt: 1 }}>Loading members...</Typography>
           </Box>
-        ) : members.length > 0 ? (
+        ) : (
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#e3f2fd" }}>
-                  <TableCell><strong>Member ID</strong></TableCell>
-                  <TableCell><strong>Team ID</strong></TableCell>
-                  <TableCell><strong>User</strong></TableCell>
-                  <TableCell><strong>Role</strong></TableCell>
-                  <TableCell><strong>Action</strong></TableCell>
+                  <TableCell align="center">Team ID</TableCell>
+                  <TableCell align="center">Company ID</TableCell>
+                  <TableCell align="center">Team Name</TableCell>
+                  <TableCell align="center">User ID</TableCell>
+                  <TableCell align="center">Name</TableCell>
+                  <TableCell align="center">Email</TableCell>
+                  <TableCell align="center">Mobile</TableCell>
+                  <TableCell align="center">Role</TableCell>
+                  <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {members.map((m) => (
-                  <TableRow
-                    key={m.id}
-                    sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
-                      "&:hover": { backgroundColor: "#f5f5f5" },
-                    }}
-                  >
-                    <TableCell>{m.id}</TableCell>
-                    <TableCell>{m.teamId}</TableCell>
-                    <TableCell>{getUserInfo(m.userId)}</TableCell>
+                {members.map((m, index) => (
+                  <TableRow key={`${m.team_id}-${m.user_id}-${index}`}>
+                    <TableCell>{m.team_id}</TableCell>
+                    <TableCell>{m.company_id}</TableCell>
+                    <TableCell>{m.team_name}</TableCell>
+                    <TableCell>{m.user_id}</TableCell>
+                    <TableCell>{m.name}</TableCell>
+                    <TableCell>{m.email}</TableCell>
+                    <TableCell>{m.mobile}</TableCell>
                     <TableCell>{m.role}</TableCell>
                     <TableCell>
                       <Button
                         size="small"
                         variant="outlined"
                         color="error"
-                        onClick={() => removeMember(m.id)}
+                        onClick={() => removeMember(m.team_id, m.user_id)}
                       >
                         Remove
                       </Button>
@@ -242,19 +273,10 @@ const TeamMembersPage = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        ) : (
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              No members found
-            </Typography>
-            <Button variant="outlined" onClick={clearFilter} sx={{ mt: 1 }}>
-              Refresh List
-            </Button>
-          </Box>
         )}
       </Paper>
 
-      {/* SNACKBAR */}
+      {/* ✅ Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

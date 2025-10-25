@@ -91,12 +91,21 @@ const Sidebar = () => {
             >
               <ListItemText primary="List All Calls" />
             </ListItemButton>
-
-            {/* <ListItemButton
-             component={Link}
-             to="" */}
           </List>
         </Collapse>
+
+        {/* <Collapse in={callsOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton
+              component={Link}
+              to="pages/call-history"
+              sx={{ pl: 4, color: "#fff" }}
+              selected={location.pathname === "/pages/call-history"}
+            >
+              <ListItemText primary="Call History" />
+            </ListItemButton>
+          </List>
+        </Collapse> */}
       </List>
 
       {/* Leads_details */}
@@ -231,9 +240,9 @@ const Sidebar = () => {
       </List>
 
       {/* Company Menu */}
-       <List>
-        {/* <ListItem disablePadding> */}
-          {/* <ListItemButton onClick={handleCompanyClick} sx={{ color: "#fff" }}>
+      <List>
+        {/* <ListItem disablePadding>  
+           <ListItemButton onClick={handleCompanyClick} sx={{ color: "#fff" }}>
             <ListItemIcon sx={{ color: "#fff" }}>
               <Business />
             </ListItemIcon>
@@ -281,10 +290,10 @@ const Sidebar = () => {
               <ListItemText primary="Company Call Details" />
             </ListItemButton>
           </List>
-        </Collapse> */}
+        </Collapse> 
 
         {/* Analytics */}
-        <ListItem disablePadding>
+        {/* <ListItem disablePadding>
           <ListItemButton
             component={Link}
             to="/reports/analytics"
@@ -296,10 +305,10 @@ const Sidebar = () => {
             </ListItemIcon>
             <ListItemText primary="Analytics" />
           </ListItemButton>
-        </ListItem>
+        </ListItem> */}
 
         {/* Settings */}
-        <ListItem disablePadding>
+        {/* <ListItem disablePadding>
           <ListItemButton
             component={Link}
             to="/settings/system"
@@ -311,11 +320,8 @@ const Sidebar = () => {
             </ListItemIcon>
             <ListItemText primary="Settings" />
           </ListItemButton>
-        </ListItem>
+        </ListItem> */}
       </List>
-
-
-
 
       <Typography
         variant="caption"

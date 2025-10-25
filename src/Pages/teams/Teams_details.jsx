@@ -18,46 +18,61 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
- const TOKEN =
-    localStorage.getItem("authToken") ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTAyMTE0NCwiZXhwIjoxNzYxMTA3NTQ0fQ.P6Yd6qwhCoORGg7SFsHnF9AINty4amVokAXFdd3t3gY";
+const TOKEN = localStorage.getItem("authToken");
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [teamForm, setTeamForm] = useState({ id: "", name: "" });
+  const [teamForm, setTeamForm] = useState({
+    id: "",
+    name: "",
+    owner_name: "",
+  });
   const [searchTeamId, setSearchTeamId] = useState("");
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const showSnackbar = (msg, severity) => setSnackbar({ open: true, message: msg, severity });
-
-  const api = axios.create({
-    baseURL: BASE_URL,
-    headers: { Authorization: `Bearer ${TOKEN}` },
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
   });
 
-  // Fetch all teams
+  const showSnackbar = (message, severity) =>
+    setSnackbar({ open: true, message, severity });
+
+  const api = axios.create({
+    baseURL: "https://superfone-admin-xw3b.onrender.com",
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Fetch all teams --> working
   const fetchTeams = async () => {
     setLoading(true);
     try {
       const res = await api.get("/api/admin/teams");
-      setTeams(res.data?.teams || []);
+      const teamList = res.data?.teams || res.data?.data || res.data || [];
+      setTeams(teamList);
     } catch (err) {
       console.error(err);
-      showSnackbar("Failed to fetch teams", "error");
+      showSnackbar(
+        err.response?.data?.message || "Failed to fetch teams",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Get team by ID
+  // Get team by ID --> working
   const getTeamById = async () => {
     if (!searchTeamId.trim()) return showSnackbar("Enter Team ID", "warning");
     setLoading(true);
     try {
       const res = await api.get(`/api/admin/teams/${searchTeamId}`);
-      if (res.data?.team) {
-        setTeams([res.data.team]);
+      const team = res.data?.team || res.data;
+      if (team) {
+        setTeams([team]);
         showSnackbar("Team found!", "success");
       } else {
         setTeams([]);
@@ -65,172 +80,234 @@ const TeamsPage = () => {
       }
     } catch (err) {
       console.error(err);
-      showSnackbar("Error fetching team", "error");
+      showSnackbar(
+        err.response?.data?.message || "Error fetching team",
+        "error"
+      );
+      setTeams([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Create team
-  // const createTeam = async () => {
-  //   const { id, name } = teamForm;
-  //   if (!id || !name) return showSnackbar("Please fill all fields", "warning");
-  //   setLoading(true);
-  //   try {
-  //     await api.post("/api/admin/teams/create", { id, name });
-  //     showSnackbar("Team created successfully!", "success");
-  //     setTeamForm({ id: "", name: "" });
-  //     fetchTeams();
-  //   } catch (err) {
-  //     console.error(err);
-  //     showSnackbar(err.response?.data?.message || "Error creating team", "error");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // Create team  --> working
   const createTeam = async () => {
-    const {name} = teamForm;
-    if(!name.trim()) return showSnackbar("Please enter a team name", "warning");
+    const { name, owner_name } = teamForm;
+    if (!name.trim() || !owner_name.trim())
+      return showSnackbar("Please enter team name and owner ID", "warning");
+
     setLoading(true);
-    try{
+    try {
       const res = await api.post("/api/admin/teams/create", {
         name,
-        members:[]
+        owner_name: owner_name, 
       });
-      showSnackbar(res.data?.message || "team created successfully", "success");
-      setTeamForm({id: "", name: ""});
+      showSnackbar(
+        res.data?.message || "Team created successfully!",
+        "success"
+      );
+      setTeamForm({ id: "", name: "", owner_name: "" });
       fetchTeams();
-    } catch(err){
-      console.error(err);
-      showSnackbar(err.response?.data?.message || "Error creating team", "error");
-    } finally{
+    } catch (err) {
+      console.error("Create error:", err.response || err);
+      showSnackbar(
+        err.response?.data?.message || "Error creating team",
+        "error"
+      );
+    } finally {
       setLoading(false);
     }
   };
 
   // Update team
   const updateTeam = async () => {
-    const { id, name } = teamForm;
-    if (!id) return showSnackbar("Enter Team ID to update", "warning");
+    const { id, name, owner_name } = teamForm;
+    if (!name.trim() || !owner_name.trim())
+      return showSnackbar("Please enter a team name and owner name", "warning");
+
     setLoading(true);
     try {
-      await api.put(`/api/admin/teams/${id}`, { name });
+      await api.put(`/api/admin/teams/update/${id}`, { name, owner_name });
       showSnackbar("Team updated successfully!", "success");
-      setTeamForm({ id: "", name: "" });
+      setTeamForm({ name: "", owner_name: "" });
       fetchTeams();
     } catch (err) {
       console.error(err);
-      showSnackbar(err.response?.data?.message || "Error updating team", "error");
+      showSnackbar(
+        err.response?.data?.message || "Error updating team",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete team
+  // Delete team --> working
   const deleteTeam = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this team?")) return;
+    console.log("Deleting team:", id);
+    if (!id) return showSnackbar("Invalid team ID", "error");
     setLoading(true);
     try {
-      await api.delete(`/api/admin/teams/${id}`);
-      showSnackbar("Team deleted!", "info");
+      const res = await api.delete(`/api/admin/teams/delete/${id}`);
+      console.log("Delete response:", res.data);
+      showSnackbar("Team deleted successfully!", "success");
       fetchTeams();
     } catch (err) {
-      console.error(err);
-      showSnackbar(err.response?.data?.message || "Error deleting team", "error");
+      // console.error("Delete error:", err.response || err);
+      showSnackbar(
+        err.response?.data?.message || "Error deleting team",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
+  };
+
+  // Pre-fill form for editing
+  const handleEdit = (team) => {
+    setTeamForm({
+      id: team.id || "",
+      name: team.name || "",
+      owner_name: team.owner_name || team.owner_id || "",
+    });
   };
 
   useEffect(() => {
-    fetchTeams();
+    if (TOKEN) fetchTeams();
   }, []);
 
   return (
     <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">Teams Management</Typography>
+      <Typography variant="h4" mb={2} fontWeight="bold">
+        Teams Management
+      </Typography>
 
       {/* Search */}
       <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f8f9fa" }}>
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="flex-end">
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          alignItems="flex-end"
+        >
           <TextField
             label="Enter Team ID"
             value={searchTeamId}
             onChange={(e) => setSearchTeamId(e.target.value)}
             size="small"
           />
-          <Button variant="contained" onClick={getTeamById}>Get Team Detail</Button>
-          <Button variant="outlined" color="secondary" onClick={fetchTeams}>Show All</Button>
+          <Button variant="contained" onClick={getTeamById}>
+            Get Team Detail
+          </Button>
+          <Button variant="contained" color="secondary" onClick={fetchTeams}>
+            Show All
+          </Button>
         </Stack>
       </Paper>
 
-      {/* Team Form */}
-      <Box sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9", color:"black" , fontWeight:"bold" }}>
-        <Typography variant="h6">Create Team</Typography>
-      {/* <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9" }}> */}
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-          {/* <TextField
-            label="Team ID"
-            value={teamForm.id}
-            onChange={(e) => setTeamForm({ ...teamForm, id: e.target.value })}
-            size="small"
-          /> */}
-          
+      {/* Create and Update Team Form */}
+      <Box sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9", color:"black", fontWeight:"bold"}}>
+        <Typography variant="h6">Create / Update Team</Typography>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2} mt={1}>
           <TextField
-            label="Team Name"
+            label="Name"
             value={teamForm.name}
             onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
             size="small"
           />
+          <TextField
+            label="Owner Name"
+            value={teamForm.owner_name}
+            onChange={(e) => setTeamForm({ ...teamForm, owner_name: e.target.value })}
+            size="small"
+          />
+
         </Stack>
         <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={createTeam}>Create Team</Button>
-          <Button variant="contained" color="info" onClick={updateTeam}>Update Team</Button>
+          <Button variant="contained" color="primary" onClick={createTeam}>
+            Create Team
+          </Button>
+          <Button variant="contained" color="info" onClick={updateTeam}>
+            Update Team
+          </Button>
         </Stack>
-       </Box>
+      </Box>
 
       {/* Team Table */}
       <Paper sx={{ p: 2 }}>
-        {loading ? <CircularProgress /> : (
+        {loading ? (
+          <CircularProgress />
+        ) : (
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Owner ID</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Company ID</TableCell>
-                  <TableCell>Member Count</TableCell>
-                  <TableCell>Action</TableCell>
+                  <TableCell align="center">ID</TableCell>
+                  <TableCell align="center">Name</TableCell>
+                  <TableCell align="center">Owner ID</TableCell>
+                  <TableCell align="center">Created At</TableCell>
+                  <TableCell align="center">Company ID</TableCell>
+                  <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {teams.map((team) => (
-                  <TableRow key={team.id}>
-                    <TableCell>{team.id}</TableCell>
-                    <TableCell>{team.name}</TableCell>
-                    <TableCell>{team.owner_id}</TableCell>
-                    <TableCell>{new Date(team.created_at).toLocaleString()}</TableCell>
-                    <TableCell>{team.company_id}</TableCell>
-                    <TableCell>{team.member_count}</TableCell>
-                    <TableCell>
-                      <Button size="small" variant="outlined" color="error" onClick={() => deleteTeam(team.id)}>Delete</Button>
+                {teams.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      No teams found.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  teams.map((team) => (
+                    <TableRow key={team.id}>
+                      <TableCell align="center">{team.id}</TableCell>
+                      <TableCell align="center">{team.name}</TableCell>
+                      <TableCell align="center">{team.owner_id}</TableCell>
+                      <TableCell align="center">
+                        {team.created_at
+                          ? new Date(team.created_at).toLocaleString()
+                          : "-"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {team.company_id || "-"}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="info"
+                          sx={{ mr: 1 }}
+                          onClick={() => handleEdit(team)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => deleteTeam(team.id)}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
         )}
       </Paper>
 
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -239,3 +316,5 @@ const TeamsPage = () => {
 };
 
 export default TeamsPage;
+
+
