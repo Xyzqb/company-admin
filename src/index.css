@@ -1,8 +1,12 @@
+/* Prevent horizontal scroll globally */
 html, body, #root {
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  font-family: 'Roboto', sans-serif; 
+  color: #fff; /* default text color */
+  background-color: #1e293b;
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: 'Roboto', sans-serif; /* optional: match Material UI font */
-  color: #fff; /* default text color */
 }
 

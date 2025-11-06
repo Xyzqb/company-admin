@@ -17,6 +17,8 @@ import {
   Alert,
 } from "@mui/material";
 import axios from "axios";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const TOKEN = localStorage.getItem("authToken");
 
@@ -100,7 +102,7 @@ const TeamsPage = () => {
     try {
       const res = await api.post("/api/admin/teams/create", {
         name,
-        owner_name: owner_name, 
+        owner_name: owner_name,
       });
       showSnackbar(
         res.data?.message || "Team created successfully!",
@@ -178,7 +180,7 @@ const TeamsPage = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">
+      <Typography variant="h5" mb={2} fontWeight="bold">
         Teams Management
       </Typography>
 
@@ -196,16 +198,26 @@ const TeamsPage = () => {
             size="small"
           />
           <Button variant="contained" onClick={getTeamById}>
+            <SearchRoundedIcon/>
             Get Team Detail
           </Button>
           <Button variant="contained" color="secondary" onClick={fetchTeams}>
+            <SearchRoundedIcon/>
             Show All
           </Button>
         </Stack>
       </Paper>
 
       {/* Create and Update Team Form */}
-      <Box sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9", color:"black", fontWeight:"bold"}}>
+      <Box
+        sx={{
+          p: 2,
+          mb: 2,
+          backgroundColor: "#f1f8e9",
+          color: "black",
+          fontWeight: "bold",
+        }}
+      >
         <Typography variant="h6">Create / Update Team</Typography>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} mt={1}>
           <TextField
@@ -217,16 +229,19 @@ const TeamsPage = () => {
           <TextField
             label="Owner Name"
             value={teamForm.owner_name}
-            onChange={(e) => setTeamForm({ ...teamForm, owner_name: e.target.value })}
+            onChange={(e) =>
+              setTeamForm({ ...teamForm, owner_name: e.target.value })
+            }
             size="small"
           />
-
         </Stack>
         <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={createTeam}>
+          <Button variant="contained" color="primary" onClick={createTeam} sx={{gap:1}}>
+            <AddCircleIcon/>
             Create Team
           </Button>
-          <Button variant="contained" color="info" onClick={updateTeam}>
+          <Button variant="contained" color="info" onClick={updateTeam} sx={{gap:1}}>
+            <AddCircleIcon/>
             Update Team
           </Button>
         </Stack>
@@ -316,5 +331,3 @@ const TeamsPage = () => {
 };
 
 export default TeamsPage;
-
-

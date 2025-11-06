@@ -13,7 +13,7 @@ import logo from "../../assets/digidial_logo.jpg";
 import axios from "axios";
 
 const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
-const token = localStorage.getItem("authToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTM2Nzg1OCwiZXhwIjoxNzYxNDU0MjU4fQ.r1exWc7_mZUlMQmrvxCmZqRjmDrprpAJJto0iVLQqsg";
+const token = localStorage.getItem("authToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTY0MjA2OSwiZXhwIjoxNzYxNzI4NDY5fQ.g6WfKTHi0Nn9j0IFPl9aogavZhsM2LsYg9ONUlt8T9k";
 
 const KYCForm = () => {
   const [formData, setFormData] = useState({
@@ -131,6 +131,7 @@ const KYCForm = () => {
             fullWidth
             label="Company Name"
             name="companyName"
+            size="small"
             value={formData.companyName}
             onChange={handleChange}
             required
@@ -140,6 +141,7 @@ const KYCForm = () => {
             fullWidth
             label="Registration Number"
             name="registrationNo"
+            size="small"
             value={formData.registrationNo}
             onChange={handleChange}
             required
@@ -149,6 +151,7 @@ const KYCForm = () => {
             fullWidth
             label="Director Name"
             name="directorName"
+            size="small"
             value={formData.directorName}
             onChange={handleChange}
             required
@@ -158,6 +161,7 @@ const KYCForm = () => {
             fullWidth
             label="Director Mobile"
             name="mobile"
+            size="small"
             value={formData.mobile}
             onChange={handleChange}
             required
@@ -168,6 +172,7 @@ const KYCForm = () => {
             label="Director Email"
             name="email"
             type="email"
+            size="small"
             value={formData.email}
             onChange={handleChange}
             required
@@ -177,6 +182,7 @@ const KYCForm = () => {
             fullWidth
             label="Company Website"
             name="website"
+            size="small"
             value={formData.website}
             onChange={handleChange}
             sx={{ mb: 2 }}
@@ -185,6 +191,7 @@ const KYCForm = () => {
             fullWidth
             label="Company Address"
             name="address"
+            size="small"
             value={formData.address}
             onChange={handleChange}
             multiline
@@ -196,6 +203,7 @@ const KYCForm = () => {
             fullWidth
             label="GST Number"
             name="gstNo"
+            size="small"
             value={formData.gstNo}
             onChange={handleChange}
             required
@@ -205,6 +213,7 @@ const KYCForm = () => {
             fullWidth
             label="Company PAN"
             name="companyPan"
+            size="small"
             value={formData.companyPan}
             onChange={handleChange}
             required
@@ -221,7 +230,7 @@ const KYCForm = () => {
               <Button variant="outlined" component="label" fullWidth>
                 Upload {field}
                 <input
-                  type="file"
+                  type="file" 
                   hidden
                   name={field}
                   accept="application/pdf"

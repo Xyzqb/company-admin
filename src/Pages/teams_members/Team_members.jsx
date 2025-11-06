@@ -17,6 +17,9 @@ import {
   Alert,
 } from "@mui/material";
 import axios from "axios";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 
 const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
 const TOKEN = localStorage.getItem("authToken");
@@ -173,19 +176,20 @@ const TeamMembersPage = () => {
             onClick={fetchMembersByTeam}
             sx={{ width: "300px" }}
           >
+            <SearchRoundedIcon/>
             Get Members by ID
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
             color="secondary"
             onClick={clearFilter}
             sx={{ width: "250px" }}
           >
+            <SearchRoundedIcon/>
             Show All
           </Button>
         </Stack>
       </Paper>
-
       {/* ✅ Add Member Section */}
       <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f1f8e9" }}>
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -218,8 +222,9 @@ const TeamMembersPage = () => {
           variant="contained"
           color="primary"
           onClick={addMember}
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, gap:1}}
         >
+          <AddCircleIcon/>
           Add Member
         </Button>
       </Paper>

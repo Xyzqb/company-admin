@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  TextField,
-  Button,
   Typography,
-  Paper,
-  Stack,
-  Table,
-  TableHead,
-  TableCell,
-  TableRow,
-  TableBody,
-  TableContainer,
   CircularProgress,
   Snackbar,
   Alert,
+  Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Button,
+  Stack,
+  TextField,
+  Grid,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import DownloadIcon from "@mui/icons-material/Download";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import axios from "axios";
 
-// const BASE_URL = "https://digidial-admin.onrender.com";
 const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
 
-const CallHistory = () => {
+const Calls_Details = () => {
   const [calls, setCalls] = useState([]);
-  const [allCalls, setAllCalls] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchId, setSearchId] = useState("");
   const [searchTeamId, setSearchTeamId] = useState("");
@@ -33,112 +35,67 @@ const CallHistory = () => {
     severity: "success",
   });
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTM2Nzg1OCwiZXhwIjoxNzYxNDU0MjU4fQ.r1exWc7_mZUlMQmrvxCmZqRjmDrprpAJJto0iVLQqsg";
+  const token = localStorage.getItem("authToken");
   const showSnackbar = (message, severity) =>
     setSnackbar({ open: true, message, severity });
 
-  // 🔹 Fetch all calls
+  // 🔹 Fetch All Calls
   const fetchAllCalls = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${BASE_URL}/api/admin/calls`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // ✅ extract the array from `calls`
-      const data = res.data?.calls || [];
-      setCalls(data);
-      setAllCalls(data);
+      setCalls(res.data?.calls || []);
     } catch (err) {
-      console.error("Fetch all calls error:", err.response || err.message);
-      showSnackbar(
-        err.response?.status === 401
-          ? "Unauthorized! Check your token."
-          : "Server error! Could not load calls.",
-        "error"
-      );
+      console.error("Error:", err);
+      showSnackbar("Failed to fetch calls!", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchCallById = async (id) => {
-  if (!id.trim()) {
-    showSnackbar("Enter call ID", "warning");
-    return;
-  }
-  setLoading(true);
-  try {
-    const res = await axios.get(`${BASE_URL}/api/admin/calls/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const callData = res.data?.call || res.data;
-    setCalls([callData]);
-    showSnackbar("Call found!", "success");
-    setSearchId(""); // ✅ Clear search bar
-  } catch (err) {
-    console.error("Fetch call by ID error:", err.response || err.message);
-    setCalls([]);
-    showSnackbar(
-      err.response?.status === 401
-        ? "Unauthorized! Check your token."
-        : "No call found with that ID!",
-      "error"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-const fetchCallsByTeamId = async (teamId) => {
-  setLoading(true);
-  try {
-    let data = [];
-    if (!teamId.trim()) {
-      const res = await axios.get(`${BASE_URL}/api/admin/calls`, {
+  // 🔹 Fetch by Call ID
+  const fetchCallById = async () => {
+    if (!searchId.trim()) return showSnackbar("Enter call ID", "warning");
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/admin/calls/${searchId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      data = res.data?.calls || [];
-    } else {
-      const res = await axios.get(`${BASE_URL}/api/admin/calls/filter`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { teamId },
-      });
-      data = res.data?.calls || [];
+      setCalls([res.data?.call || res.data]);
+      showSnackbar("Call found!", "success");
+    } catch {
+      showSnackbar("No call found!", "error");
+    } finally {
+      setLoading(false);
+      setSearchId("");
     }
+  };
 
-    setCalls(data);
-    showSnackbar(
-      data.length
-        ? teamId
-          ? "Filtered calls loaded!"
-          : "All calls loaded!"
-        : "No calls found!",
-      data.length ? "success" : "info"
-    );
-    setSearchTeamId(""); // ✅ Clear search bar
-  } catch (err) {
-    console.error("Filter calls error:", err.response || err.message);
-    setCalls([]);
-    showSnackbar(
-      err.response?.status === 401
-        ? "Unauthorized! Check your token."
-        : "Server error! Could not load calls.",
-      "error"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-  console.log("Current calls state:", calls);
-
-  // 🔹 Clear search
-  const clearSearch = () => {
-    setSearchId("");
-    setSearchTeamId("");
-    setCalls(allCalls);
-    showSnackbar("Showing all calls", "info");
+  // 🔹 Fetch by Team ID
+  const fetchCallsByTeamId = async () => {
+    setLoading(true);
+    try {
+      let res;
+      if (!searchTeamId.trim()) {
+        res = await axios.get(`${BASE_URL}/api/admin/calls`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } else {
+        res = await axios.get(`${BASE_URL}/api/admin/calls/filter`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { teamId: searchTeamId },
+        });
+      }
+      setCalls(res.data?.calls || []);
+      showSnackbar("Filtered calls loaded!", "success");
+    } catch {
+      showSnackbar("Error filtering calls", "error");
+    } finally {
+      setLoading(false);
+      setSearchTeamId("");
+    }
   };
 
   useEffect(() => {
@@ -146,16 +103,17 @@ const fetchCallsByTeamId = async (teamId) => {
   }, []);
 
   return (
-    <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">
+    <Box sx={{ p: 2, mx: "auto", mt: 3 }}>
+      <Typography variant="h5" mb={2} fontWeight="bold">
         Call Details
       </Typography>
 
-      {/* Search Section */}
-      <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f8f9fa" }}>
+      {/* 🔹 Search Section */}
+      <Paper sx={{ p: 2, mb: 3, backgroundColor: "#f8fafc" }}>
         <Typography variant="h6" mb={2} fontWeight="bold">
           Search Calls
         </Typography>
+
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -166,14 +124,15 @@ const fetchCallsByTeamId = async (teamId) => {
               label="Search by Call ID"
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
-              fullWidth
+              sx={{ width: "300px" }}
               size="small"
             />
             <Button
               variant="contained"
-              sx={{ mt: 1, width: "100%" }}
-              onClick={() => fetchCallById(searchId)}
+              sx={{ mt: 1, width: "300px" }}    
+              onClick={fetchCallById}
             >
+              <SearchRoundedIcon />
               Search by ID
             </Button>
           </Box>
@@ -181,16 +140,17 @@ const fetchCallsByTeamId = async (teamId) => {
           <Box sx={{ flex: 1 }}>
             <TextField
               label="Search by Team ID"
+              sx={{ width: "300px" }}
               value={searchTeamId}
               onChange={(e) => setSearchTeamId(e.target.value)}
-              fullWidth
               size="small"
             />
             <Button
               variant="contained"
-              sx={{ mt: 1, width: "100%" }}
-              onClick={() => fetchCallsByTeamId(searchTeamId)}
+              sx={{ mt: 1, width: "300px" }}
+              onClick={fetchCallsByTeamId}
             >
+              <SearchRoundedIcon />
               Search by Team ID
             </Button>
           </Box>
@@ -198,105 +158,128 @@ const fetchCallsByTeamId = async (teamId) => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => fetchCallsByTeamId("")} // pass empty string to fetch all
-            sx={{ height: "35px" }}
+            onClick={fetchAllCalls}
+            sx={{ height: "36px", width: "300px" }}
           >
+            <SearchRoundedIcon />
             Show All
           </Button>
         </Stack>
       </Paper>
 
-      {/* Calls Table */}
-      <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" mb={2} fontWeight="bold">
-          Call List {calls.length > 0 && `(${calls.length})`}
-        </Typography>
+      {/* 🔹 Calls in Card Format */}
+      {loading ? (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <CircularProgress />
+          <Typography sx={{ mt: 1 }}>Loading calls...</Typography>
+        </Box>
+      ) : calls.length > 0 ? (
+        <Grid container spacing={2}>
+          {calls.map((call, index) => (
+            <Grid item xs={4} sm={4} md={4} lg={3} key={index}>
+              <Accordion
+                sx={{
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  "&:before": { display: "none" },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{
+                    backgroundColor: "#e2e8f0",
+                    borderRadius: "8px 8px 0 0",
+                    height: "110px",
+                    width:"305px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Box sx={{textAlign:"center"}}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Team ID: {call.team_id || "N/A"}
+                    </Typography>
+                    <Typography variant="h6" fontWeight="bold" sx={{textAlign:"center"}}>
+                      Call ID: {call.id || "N/A"}
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
 
-        {loading ? (
-          <Box sx={{ textAlign: "center", py: 3 }}>
-            <CircularProgress />
-            <Typography sx={{ mt: 1 }}>Loading calls...</Typography>
-          </Box>
-        ) : calls.length > 0 ? (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#e3f2fd" }}>
-                  <TableCell align="center">
-                    <strong>Call ID</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>Team ID</strong>
-                  </TableCell>{" "}
-                  {/* Added */}
-                  <TableCell align="center">
-                    <strong>From Number</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>To Number</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>Status</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>Duration</strong>
-                  </TableCell>
-                  <TableCell align="center">
-                    <strong>Started At</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {calls.map((call, idx) => (
-                  <TableRow
-                    key={call.id || idx}
-                    sx={{
-                      "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
-                      "&:hover": { backgroundColor: "#f5f5f5" },
-                    }}
-                  >
-                    <TableCell align="center">{call.id || "N/A"}</TableCell>
-                    <TableCell align="center">
-                      {call.team_id || "N/A"}
-                    </TableCell>{" "}
-                    {/* Corrected */}
-                    <TableCell align="center">
-                      {call.from_number || "N/A"}
-                    </TableCell>
-                    <TableCell align="center">
-                      {call.to_number || "N/A"}
-                    </TableCell>
-                    <TableCell align="center">{call.status || "N/A"}</TableCell>
-                    <TableCell align="center">
+                <AccordionDetails>
+                  <Stack spacing={1}>
+                    <Typography>
+                      <strong>From:</strong> {call.from_number || "N/A"}
+                    </Typography>
+                    <Typography>
+                      <strong>To:</strong> {call.to_number || "N/A"}
+                    </Typography>
+                    <Typography>
+                      <strong>Status:</strong> {call.status || "N/A"}
+                    </Typography>
+                    <Typography>
+                      <strong>Duration:</strong>{" "}
                       {call.duration
                         ? typeof call.duration === "object"
                           ? `${call.duration.seconds || 0}s`
                           : call.duration
                         : "N/A"}
-                    </TableCell>
-                    <TableCell align="center">
+                    </Typography>
+                    <Typography>
+                      <strong>Started At:</strong>{" "}
                       {call.started_at
                         ? new Date(call.started_at).toLocaleString()
                         : "N/A"}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ) : (
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              No calls found
-            </Typography>
-            <Button variant="outlined" onClick={clearSearch} sx={{ mt: 1 }}>
-              Refresh List
-            </Button>
-          </Box>
-        )}
-      </Paper>
+                    </Typography>
 
+                    {/* 🎧 Recording Section */}
+                    <Box sx={{ textAlign: "center", mt: 1 }}>
+                      {call.recording_url ? (
+                        <>
+                          <Tooltip title="Play Recording">
+                            <IconButton
+                              color="primary"
+                              href={call.recording_url}
+                              target="_blank"
+                            >
+                              <PlayArrowIcon />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="Download Recording">
+                            <IconButton
+                              color="secondary"
+                              href={call.recording_url}
+                              download
+                            >
+                              <DownloadIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      ) : (
+                        <Typography color="text.secondary" variant="body2">
+                          No Recording Available
+                        </Typography>
+                      )}
+                    </Box>
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="h6" color="text.secondary">
+            No calls found
+          </Typography>
+          <Button variant="outlined" onClick={fetchAllCalls} sx={{ mt: 2 }}>
+            Refresh
+          </Button>
+        </Box>
+      )}
+
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
@@ -314,4 +297,4 @@ const fetchCallsByTeamId = async (teamId) => {
   );
 };
 
-export default CallHistory;
+export default Calls_Details;

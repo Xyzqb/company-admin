@@ -17,12 +17,12 @@ import {
   Alert,
 } from "@mui/material";
 import axios from "axios";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const PhonesPage = () => {
   const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
-  const token =
-    localStorage.getItem("authToken") ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTAyMTE0NCwiZXhwIjoxNzYxMTA3NTQ0fQ.P6Yd6qwhCoORGg7SFsHnF9AINty4amVokAXFdd3t3gY";
+  const token = localStorage.getItem("authToken");
 
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -133,8 +133,8 @@ const PhonesPage = () => {
   }, []);
 
   return (
-    <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3, mb: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">
+    <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3, mb: 1}}>
+      <Typography variant="h5" mb={2} fontWeight="bold">
         Phone Numbers Management
       </Typography>
 
@@ -160,11 +160,13 @@ const PhonesPage = () => {
             onClick={filterByTeam}
             sx={{ bgcolor: "primary.main", color: "white", width:"300px" }}
           >
+            <SearchRoundedIcon/>
             Filter
           </Button>
           <Button variant="contained" color="secondary" onClick={clearFilter}
            sx={{width:"220px" }}
           >
+            <SearchRoundedIcon/>
             Show All
           </Button>
         </Stack>
@@ -193,8 +195,9 @@ const PhonesPage = () => {
             size="small"
           />
           <Button variant="contained" color="primary" onClick={addPhone}
-           sx={{width:"240px" }}
+           sx={{width:"240px" , gap:1}}
           >
+            <AddCircleIcon/>
             Add Phone
           </Button>
         </Stack>

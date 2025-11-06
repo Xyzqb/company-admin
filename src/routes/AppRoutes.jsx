@@ -9,12 +9,10 @@ import {
 
 // Pages
 import Login from "../Pages/Login";
-import CompanyContactList from "../Pages/Companies/CompanyContactList";
-import AddEditContact from "../Pages/Companies/AddEditContact";
-import CompanyCallLog from "../Pages/Companies/CompanyCallLog";
-import CallDetails from "../Pages/Companies/CallDetails";
-import Analytics from "../Pages/Reports/Analytics";
-import SystemSettings from "../Pages/Settings/SystemSettings";
+// import CompanyContactList from "../Pages/Companies/CompanyContactList";
+// import AddEditContact from "../Pages/Companies/AddEditContact";
+// import CompanyCallLog from "../Pages/Companies/CompanyCallLog";
+// import CallDetails from "../Pages/Companies/CallDetails";
 import Call_Details from "../Pages/calls/Calls_details";
 import Leads_details from "../Pages/leads/Lead_Details"; 
 import Phones_details from "../Pages/phones/Phone_details";
@@ -27,10 +25,17 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import PrivateRoute from "../components/PrivateRoute";
 
+// Plans
+import PurchaseCompanyPlan from "../Pages/Plans/PurchaseCompanyPlan";
+import { ImageOutlined } from "@mui/icons-material";
+
+// agents
+import AgentsDetails from "../Pages/agents/AgentsDetails";
+
 // Layout wrapper for authenticated routes
 function AppLayout() {
   return (
-    <div style={{ display: "flex", minHeight: "140vh", width:"1250px", flexDirection: "column", background: "#1e293b" }}>
+    <div style={{ display: "flex", minHeight: "140vh", flexDirection: "column", background: "#1e293b" }}>
       <Navbar />
       <div style={{ display: "flex", flex: 1 }}>
         <Sidebar />
@@ -54,10 +59,13 @@ function AppRoutes() {
           <Route path="/*" element={<AppLayout />}>
 
             {/* Company Management */}
-            <Route path="companies/contact-list" element={<CompanyContactList/>}/>
+            {/* <Route path="companies/contact-list" element={<CompanyContactList/>}/>
             <Route path="companies/add-edit-contact" element={<AddEditContact />} />
             <Route path="companies/call-log" element={<CompanyCallLog />} />
-            <Route path="companies/call-details" element={<CallDetails />} />
+            <Route path="companies/call-details" element={<CallDetails />} /> */}
+
+            {/* agents details */}
+            <Route path="pages/agents" element={<AgentsDetails/>}/>
 
             {/* call_details */}
             <Route path="pages/list_calls" element={<Call_Details/>}/>
@@ -81,11 +89,8 @@ function AppRoutes() {
             {/* webhook_logs */}
             <Route path="pages/webhook_logs" element ={<Webhook_Logs/>}/>
 
-            {/* Reports */}
-            <Route path="reports/analytics" element={<Analytics />} />
-
-            {/* Settings */}
-            <Route path="settings/system" element={<SystemSettings />} />
+            {/* Plans */}
+            <Route path="Plans/purchase-plan" element={<PurchaseCompanyPlan/>}></Route>
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

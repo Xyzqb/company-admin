@@ -23,11 +23,10 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import CloseIcon from "@mui/icons-material/Close";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import axios from "axios";
 
-const TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE0MCIsImVtYWlsIjoiZmZAZ21haWwuY29tIiwiZ2xvYmFsX3JvbGUiOiJhZG1pbiIsImNvbXBhbnlfaWQiOiIxIiwiaWF0IjoxNzYxMjgzMDI5LCJleHAiOjE3NjEzNjk0Mjl9.InaMWY1C9tow07PLVfS4j8VQYJhXUronnljJpQXZYC4";
-
+const TOKEN = localStorage.getItem("authToken");
 const WebhookLogsPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -132,7 +131,7 @@ const WebhookLogsPage = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">
+      <Typography variant="h5" mb={2} fontWeight="bold">
         Webhook Logs Management
       </Typography>
 
@@ -160,6 +159,7 @@ const WebhookLogsPage = () => {
                 color: "white",
               }}
             >
+              <SearchRoundedIcon/>
               Get Log by ID
             </Button>
           </Box>
@@ -182,6 +182,7 @@ const WebhookLogsPage = () => {
                 color: "white",
               }}
             >
+              <SearchRoundedIcon/>
               Get Logs by Team
             </Button>
           </Box>
@@ -192,6 +193,7 @@ const WebhookLogsPage = () => {
             onClick={clearFilter}
             sx={{ height: "40px", mt: { xs: 2, md: 0 } }}
           >
+            <SearchRoundedIcon/>
             Show All Logs
           </Button>
         </Stack>

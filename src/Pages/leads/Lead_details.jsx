@@ -16,11 +16,16 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import {jwtDecode} from "jwt-decode";
 import axios from "axios";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 const BASE_URL = "https://superfone-admin-xw3b.onrender.com";
 
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQyIiwiZW1haWwiOiJhZG1pbkBhYmNkLmNvbSIsImdsb2JhbF9yb2xlIjoiYWRtaW4iLCJjb21wYW55X2lkIjoiMiIsImlhdCI6MTc2MTM2Nzg1OCwiZXhwIjoxNzYxNDU0MjU4fQ.r1exWc7_mZUlMQmrvxCmZqRjmDrprpAJJto0iVLQqsg"; 
+const TOKEN = localStorage.getItem("authToken");
+console.log(TOKEN)
+//  const decodedData = jwtDecode(TOKEN);
+//  console.log("Decoded JWT Data:", decodedData);
 
 const LeadsPage = () => {
   const [leads, setLeads] = useState([]);
@@ -66,6 +71,7 @@ const LeadsPage = () => {
   //     setLoading(false);
   //   }
   // };
+
   const fetchAllLeads = async () => {
   setLoading(true);
   try {
@@ -124,6 +130,7 @@ const LeadsPage = () => {
     }
   };
 
+  
   // Create or update lead
   const saveLead = async () => {
     let { id, team_id, phone, name, assigned_to, notes } = leadForm;
@@ -132,6 +139,7 @@ const LeadsPage = () => {
       return showSnackbar("Team ID, Phone & Name are required", "warning");
 
     const payload = {
+      id: id ? Number(id) : undefined,
       team_id: Number(team_id),
       phone: phone.trim(),
       name: name.trim(),
@@ -139,10 +147,12 @@ const LeadsPage = () => {
       assigned_to: assigned_to ? assigned_to.trim() : null,
     };
 
+    console.log("Payload to be sent:", payload);
+
     setLoading(true);
     try {
       if (editing && id) {
-        await api.put(`/api/admin/leads/update/${team_id}`, payload);
+        await api.put(`/api/admin/leads/update/${id}`, payload);
         showSnackbar("Lead updated successfully!", "success");
       } else {
         await api.post(`/api/admin/leads/create`, payload);
@@ -152,13 +162,12 @@ const LeadsPage = () => {
       setEditing(false);
       fetchAllLeads();
     } catch (err) {
-      console.error(err);
+      console.error(err, "Error in saveLead");
       showSnackbar(err.response?.data?.message || "Error saving lead", "error");
     } finally {
       setLoading(false);
     }
   };
-
   // Edit lead
   const editLead = (lead) => {
     setLeadForm({ ...lead });
@@ -193,15 +202,15 @@ const LeadsPage = () => {
   }, []);
 
      return (
-    <Box sx={{ p: 2, maxWidth: "1200px", mx: "auto", mt: 3 }}>
-      <Typography variant="h4" mb={2} fontWeight="bold">
-        Leads Management
+    <Box sx={{ p: 2, maxWidth: "1000px", mx: "auto", mt: 3 }}>
+      <Typography variant="h5" mb={2} fontWeight="bold">
+        Leads Details
       </Typography>
 
       {/* Search / Filter */}
       <Paper sx={{ p: 2, mb: 2, backgroundColor: "#f8f9fa" }}>
         <Typography variant="h6" mb={2} fontWeight="bold">
-          Search / Filter Leads
+          Search Leads
         </Typography>
         <Stack
           direction={{ xs: "column", md: "row" }}
@@ -213,14 +222,15 @@ const LeadsPage = () => {
               label="Search by Lead ID"
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
-              fullWidth
+              sx={{ mt: 1, width: "200px" }}
               size="small"
             />
             <Button
               variant="contained"
-              sx={{ mt: 1, width: "100%" }}
+              sx={{ mt: 1, width: "200px" }}
               onClick={fetchLeadById}
             >
+                <SearchRoundedIcon/>
               Search by ID
             </Button>
           </Box>
@@ -230,12 +240,12 @@ const LeadsPage = () => {
               label="Search by Name"
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              fullWidth
+              sx={{ mt: 1, width: "200px" }}
               size="small"
             />
             <Button
               variant="contained"
-              sx={{ mt: 1, width: "100%" }}
+              sx={{ mt: 1, width: "200px" }}
               onClick={() => {
                 if (!searchName.trim())
                   return showSnackbar("Enter Name", "warning");
@@ -247,6 +257,7 @@ const LeadsPage = () => {
                 showSnackbar("Leads filtered by name!", "success");
               }}
             >
+                <SearchRoundedIcon/>
               Search by Name
             </Button>
           </Box>
@@ -256,24 +267,27 @@ const LeadsPage = () => {
               label="Filter by Team ID"
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
-              fullWidth
+             
+              sx={{ mt: 1, width: "200px" }}
               size="small"
             />
             <Button
               variant="contained"
-              sx={{ mt: 1, width: "100%" }}
+              sx={{ mt: 1, width: "200px" }}
               onClick={fetchLeadsByTeam}
             >
+                <SearchRoundedIcon/>
               Filter by Team
             </Button>
           </Box>
 
           <Button
-            variant="outlined"
+            variant="contained"
             color="secondary"
             onClick={clearSearch}
-            sx={{ height: "35px" }}
+            sx={{ mt: 1, width: "200px" }}
           >
+            <SearchRoundedIcon/>
             Show All
           </Button>
         </Stack>
