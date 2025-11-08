@@ -1,114 +1,112 @@
-// import React, { useState } from "react";
-// import {
-//   AppBar,
-//   Toolbar,
-//   Stack,
-//   Box,
-//   Typography,
-//   IconButton,
-//   Tooltip,
-//   Button,
-//   Dialog,
-//   DialogTitle,
-//   DialogContent
-// } from "@mui/material";
-// import NotificationsIcon from "@mui/icons-material/Notifications";
-// import MessageIcon from "@mui/icons-material/Message";
-// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-// import LogoutIcon from "@mui/icons-material/Logout";
-// import logo from "../assets/digidial_logo.jpg";
-// import { useNavigate } from "react-router-dom";
-// import KYCForm from "../Pages/kyc/Kyc_details";
+import React, { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Stack,
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import MessageIcon from "@mui/icons-material/Message";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
+import logo from "../assets/digidial_logo.jpg";
+import { useNavigate } from "react-router-dom";
+import KYCForm from "../Pages/kyc/Kyc_details";
 
-// export const NAVBAR_HEIGHT = 48;
+export const NAVBAR_HEIGHT = 48;
 
-// const Navbar = () => {
-//   const navigate = useNavigate();
+const Navbar = () => {
+  const navigate = useNavigate();
 
-//   const handleLogout = () => {
-//     localStorage.removeItem("authToken"); // clear token
-//     navigate("/login");
-//   };
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // clear token
+    navigate("/login");
+  };
 
-//   const[openkyc, setOpenKyc] = useState(false);
+  const[openkyc, setOpenKyc] = useState(false);
 
-//   const handleOpenKyc = () => setOpenKyc(true);
-//   const handleCloseKyc = () => setOpenKyc(false);
+  const handleOpenKyc = () => setOpenKyc(true);
+  const handleCloseKyc = () => setOpenKyc(false);
 
-//   // const[]
+  return (
+    <>
+    <AppBar
+      position="fixed"
+      sx={{ 
+        height: `${NAVBAR_HEIGHT}px`,  
+        background: "#334155",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
+      <Toolbar
+        sx={{
+          minHeight: `${NAVBAR_HEIGHT}px !important`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {/* Left: Logo and Title */}
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Box
+            component="img"
+            src={logo}
+            alt="digidial"
+            sx={{ height: 40, width: 40, borderRadius: "50%" }}
+          />
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            DigiDial
+          </Typography>
+        </Stack>
 
-//   return (
-//     <>
-//     <AppBar
-//       position="fixed"
-//       sx={{
-//         height: `${NAVBAR_HEIGHT}px`,
-//         background: "#334155",
-//         zIndex: (theme) => theme.zIndex.drawer + 1,
-//       }}
-//     >
-//       <Toolbar
-//         sx={{
-//           minHeight: `${NAVBAR_HEIGHT}px !important`,
-//           display: "flex",
-//           alignItems: "center",
-//           justifyContent: "space-between",
-//         }}
-//       >
-//         {/* Left: Logo and Title */}
-//         <Stack direction="row" spacing={1} alignItems="center">
-//           <Box
-//             component="img"
-//             src={logo}
-//             alt="digidial"
-//             sx={{ height: 40, width: 40, borderRadius: "50%" }}
-//           />
-//           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-//             DigiDial
-//           </Typography>
-//         </Stack>
+        {/* Right: Icons and Logout */}
+        <Stack direction="row" spacing={1} alignItems="center">
+          {/* <Tooltip title="Profile">
+            <IconButton sx={{ color: "#fff" }}>
+              <AccountCircleIcon />
+            </IconButton>
+          </Tooltip> */}
 
-//         {/* Right: Icons and Logout */}
-//         <Stack direction="row" spacing={1} alignItems="center">
-//           {/* <Tooltip title="Profile">
-//             <IconButton sx={{ color: "#fff" }}>
-//               <AccountCircleIcon />
-//             </IconButton>
-//           </Tooltip> */}
+          <Button 
+          variant="contained"
+          color="primary"
+          onClick={() => setOpenKyc(true)}
+          sx={{ml:"1" , width:"120px", height:"34px", color:"white"}}
+          >
+          KYC Form
+          </Button>
 
-//           <Button 
-//           variant="contained"
-//           color="primary"
-//           onClick={() => setOpenKyc(true)}
-//           sx={{ml:"1" , width:"120px", height:"34px", color:"white"}}
-//           >
-//           KYC Form
-//           </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+            sx={{ ml: 1 }}
+          >
+            Logout
+          </Button>
+        </Stack>
+      </Toolbar>
+    </AppBar>
+    {/* KYC Form Modal */}
+      <Dialog open={openkyc} onClose={handleCloseKyc} fullWidth maxWidth="md">
+        <DialogTitle sx={{fontWeight:"bold", pt:2}}>KYC Form</DialogTitle>
+        <DialogContent>
+          <KYCForm />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
-//           <Button
-//             variant="contained"
-//             color="secondary"
-//             startIcon={<LogoutIcon />}
-//             onClick={handleLogout}
-//             sx={{ ml: 1 }}
-//           >
-//             Logout
-//           </Button>
-//         </Stack>
-//       </Toolbar>
-//     </AppBar>
-//     {/* KYC Form Modal */}
-//       <Dialog open={openkyc} onClose={handleCloseKyc} fullWidth maxWidth="md">
-//         <DialogTitle sx={{fontWeight:"bold", pt:2}}>KYC Form</DialogTitle>
-//         <DialogContent>
-//           <KYCForm />
-//         </DialogContent>
-//       </Dialog>
-//     </>
-//   );
-// };
-
-// export default Navbar;
+export default Navbar;
 
 
 // import React, { useState, useMemo } from "react";
@@ -277,107 +275,3 @@
 // };
 
 // export default Navbar;
-
-
-const Navbar = ({ darkMode, setDarkMode }) => {
-  const navigate = useNavigate();
-  const [openKyc, setOpenKyc] = useState(false);
-
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    navigate("/login");
-  };
-
-  return (
-    <AppBar
-      position="fixed"
-      sx={{
-        height: "48px",
-        background: darkMode ? "#1e293b" : "#334155",
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        transition: "background 0.3s ease",
-      }}
-    >
-      <Toolbar
-        sx={{
-          minHeight: "48px !important",
-          display: "flex",
-          justifyContent: "space-between",
-          px: { xs: 1, sm: 2 },
-        }}
-      >
-        {/* Left */}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Box
-            component="img"
-            src={logo}
-            alt="digidial"
-            sx={{
-              height: 36,
-              width: 36,
-              borderRadius: "50%",
-              bgcolor: "#fff",
-            }}
-          />
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bold",
-              display: { xs: "none", sm: "block" }, // hide title on very small screens
-            }}
-          >
-            DigiDial
-          </Typography>
-        </Stack>
-
-        {/* Right */}
-        <Stack direction="row" spacing={1} alignItems="center">
-          {/* Dark Mode Toggle */}
-          <Tooltip title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
-            <IconButton
-              onClick={() => setDarkMode(!darkMode)}
-              color="inherit"
-              sx={{ border: "1px solid rgba(255,255,255,0.2)" }}
-            >
-              {darkMode ? (
-                <LightModeIcon sx={{ color: "#facc15" }} />
-              ) : (
-                <DarkModeIcon sx={{ color: "#fff" }} />
-              )}
-            </IconButton>
-          </Tooltip>
-
-          {/* KYC Form */}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setOpenKyc(true)}
-            sx={{
-              height: 34,
-              px: { xs: 1, sm: 2 },
-              fontSize: { xs: "0.7rem", sm: "0.8rem" },
-            }}
-          >
-            KYC
-          </Button>
-
-          {/* Logout */}
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Stack>
-      </Toolbar>
-
-      {/* KYC Dialog */}
-      <Dialog open={openKyc} onClose={() => setOpenKyc(false)} fullWidth maxWidth="md">
-        <DialogTitle sx={{ fontWeight: "bold" }}>KYC Form</DialogTitle>
-        <DialogContent>
-          <KYCForm />
-        </DialogContent>
-      </Dialog>
-    </AppBar>
-  );
-};
-
-
-

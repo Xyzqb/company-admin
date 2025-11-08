@@ -14,7 +14,7 @@ import Login from "../Pages/Login";
 // import CompanyCallLog from "../Pages/Companies/CompanyCallLog";
 // import CallDetails from "../Pages/Companies/CallDetails";
 import Call_Details from "../Pages/calls/Calls_details";
-import Leads_details from "../Pages/leads/Lead_Details"; 
+import LeadDetails from "../Pages/leads/LeadDetails"; 
 import Phones_details from "../Pages/phones/Phone_details";
 import Teams_details from "../Pages/teams/Teams_details";
 import Team_Members from "../Pages/teams_members/Team_members";
@@ -74,7 +74,7 @@ function AppRoutes() {
             <Route path="pages/list_callsByFilter" element={<call_filter/>}/>
 
             {/* lead_details */}
-            <Route path="pages/leads_details" element={<Leads_details/>}/>
+            <Route path="pages/leads_details" element={<LeadDetails/>}/>
 
             {/* Phones_Details */}
             <Route path="pages/phone_details" element ={<Phones_details/>}/>

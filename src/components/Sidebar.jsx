@@ -721,9 +721,9 @@ const Sidebar = () => {
           <List component="div" disablePadding sx={{ background: submenuBg }}>
             <ListItemButton
               component={Link}
-              to="pages/purchase_plan"
+              to="Plans/purchase-plan"
               sx={{ pl: 6, color: "#fff" }}
-              selected={location.pathname === "/pages/purchase_plan"}
+              selected={location.pathname === "Plans/purchase-plan"}
             >
               <ListItemText
                 primary="View Plans"

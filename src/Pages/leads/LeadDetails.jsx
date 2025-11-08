@@ -27,7 +27,7 @@ console.log(TOKEN)
 //  const decodedData = jwtDecode(TOKEN);
 //  console.log("Decoded JWT Data:", decodedData);
 
-const LeadsPage = () => {
+const LeadDetails = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchId, setSearchId] = useState("");
@@ -460,4 +460,4 @@ const LeadsPage = () => {
   );
 };
 
-export default LeadsPage;
+export default LeadDetails;
